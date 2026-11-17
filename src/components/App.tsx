@@ -32,6 +32,7 @@ import {downloadGlyphsMetadata, downloadSpriteMetadata} from "../libs/metadata";
 import { emptyStyle, getAccessToken, replaceAccessTokens } from "../libs/style";
 import { undoMessages, redoMessages } from "../libs/diffmessage";
 import { createStyleStore, type IStyleStore } from "../libs/store/style-store-factory";
+import { stripImageParams } from "../libs/image-params";
 import { RevisionStore } from "../libs/revisions";
 import { LayerWatcher } from "../libs/layerwatcher";
 import tokens from "../config/tokens.json";
@@ -712,7 +713,7 @@ export class App extends React.Component<any, AppState> {
     const {mapStyle, dirtyMapStyle} = this.state;
 
     const mapProps = {
-      mapStyle: (dirtyMapStyle || mapStyle),
+      mapStyle: stripImageParams(dirtyMapStyle || mapStyle),
       mapView: this.state.mapView,
       replaceAccessTokens: (mapStyle: StyleSpecification) => {
         return replaceAccessTokens(mapStyle, {
