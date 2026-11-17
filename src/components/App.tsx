@@ -711,9 +711,11 @@ export class App extends React.Component<any, AppState> {
 
   mapRenderer() {
     const {mapStyle, dirtyMapStyle} = this.state;
+    const renderer = this._getRenderer();
 
     const mapProps = {
-      mapStyle: stripImageParams(dirtyMapStyle || mapStyle),
+      // Map Jr. GL draws `params` of the image expression. MapLibre GL JS and OpenLayers reject them.
+      mapStyle: __MAPLIBRE__ || renderer === "ol" ? stripImageParams(dirtyMapStyle || mapStyle) : (dirtyMapStyle || mapStyle),
       mapView: this.state.mapView,
       replaceAccessTokens: (mapStyle: StyleSpecification) => {
         return replaceAccessTokens(mapStyle, {
@@ -725,8 +727,6 @@ export class App extends React.Component<any, AppState> {
         this.fetchSources();
       },
     };
-
-    const renderer = this._getRenderer();
 
     let mapElement;
 

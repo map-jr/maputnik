@@ -167,8 +167,11 @@ class MapMaplibreGlInternal extends React.Component<MapMaplibreGlInternalProps, 
       localIdeographFontFamily: false
     } satisfies MapOptions;
 
-    const protocol = new Protocol({metadata: true});
-    MapLibreGl.addProtocol("pmtiles",protocol.tile);
+    // Map Jr. GL reads pmtiles:// URLs itself.
+    if (__MAPLIBRE__) {
+      const protocol = new Protocol({metadata: true});
+      MapLibreGl.addProtocol("pmtiles",protocol.tile);
+    }
     const map = new MapLibreGl.Map(mapOpts);
 
     const mapViewChange = () => {

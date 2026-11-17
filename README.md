@@ -4,14 +4,14 @@
 
 > **This is the Map Jr. GL fork of Maputnik.** It edits styles written for
 > [Map Jr. GL](https://github.com/map-jr/map-jr-gl), such as those of
-> [map-jr-styles](https://github.com/map-jr/map-jr-styles), which give the slots of an SVG template their values
-> with `["image", name, {"params": {...}}]`. It differs from upstream in two ways:
+> [map-jr-styles](https://github.com/map-jr/map-jr-styles). It differs from upstream in three ways:
 >
-> - It validates styles with [map-jr/maplibre-style-spec](https://github.com/map-jr/maplibre-style-spec), which
->   accepts `params`.
-> - The map preview draws `["image", name]` in place of each `image` with `params`, because MapLibre GL JS rejects
->   the third argument. The preview shows no icons from `metadata["map-jr:images"]`. The style that Maputnik saves
->   keeps `params` and the metadata.
+> - The map preview renders with Map Jr. GL (`@map-jr/map-jr-gl/maplibre-compat`, which has the API of MapLibre GL JS)
+>   in place of MapLibre GL JS. `MAPUTNIK_RENDERER=maplibre npm start` (or `npm run build`) uses MapLibre GL JS.
+> - It validates styles with [map-jr/maplibre-style-spec](https://github.com/map-jr/maplibre-style-spec), which accepts
+>   `["image", name, {"params": {...}}]`, the values for the slots of an SVG template.
+> - A preview that cannot read `params` (MapLibre GL JS, OpenLayers) gets `["image", name]` in its place. The style
+>   that Maputnik saves keeps `params`.
 >
 > The fork runs at https://map-jr.github.io/maputnik/. Open a style with `?style=<URL>`. The branch `map-jr-main`
 > holds the changes; `main` follows upstream.
