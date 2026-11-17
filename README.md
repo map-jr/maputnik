@@ -1,6 +1,21 @@
 <img width="200" alt="Maputnik logo" src="https://cdn.jsdelivr.net/gh/maputnik/design/logos/logo-color.png" />
 
 # Maputnik
+
+> **This is the Map Jr. GL fork of Maputnik.** It edits styles written for
+> [Map Jr. GL](https://github.com/map-jr/map-jr-gl), such as those of
+> [map-jr-styles](https://github.com/map-jr/map-jr-styles), which give the slots of an SVG template their values
+> with `["image", name, {"params": {...}}]`. It differs from upstream in two ways:
+>
+> - It validates styles with [map-jr/maplibre-style-spec](https://github.com/map-jr/maplibre-style-spec), which
+>   accepts `params`.
+> - The map preview draws `["image", name]` in place of each `image` with `params`, because MapLibre GL JS rejects
+>   the third argument. The preview shows no icons from `metadata["map-jr:images"]`. The style that Maputnik saves
+>   keeps `params` and the metadata.
+>
+> The fork runs at https://map-jr.github.io/maputnik/. Open a style with `?style=<URL>`. The branch `map-jr-main`
+> holds the changes; `main` follows upstream.
+
 [![GitHub CI status](https://github.com/maplibre/maputnik/workflows/ci/badge.svg)][github-action-ci]
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)][license]
 
