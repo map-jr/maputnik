@@ -42,6 +42,8 @@ export class MaputnikDriver {
         "access-token-style.json",
         "grouped-layers-style.json",
         "example-style-with-mbgljs-renderer.json",
+        "vector-tiles-style.json",
+        "places-tilejson.json",
       ];
       for (const fixture of styleFixtures) {
         await this.helper.given.interceptAndMockResponse({
@@ -63,6 +65,12 @@ export class MaputnikDriver {
         url: /cdn\.jsdelivr\.net\/.*\/empty-style\.json$/,
         response: emptyStyle,
       });
+      // Every tile of vector-tiles-style.json is the same small tile with points in the layer "places".
+      await this.helper.given.interceptAndServeFixtureFile(
+        /localhost:8888\/tiles\//,
+        "places.mvt",
+        "application/vnd.mapbox-vector-tile"
+      );
     },
   };
 
@@ -95,6 +103,7 @@ export class MaputnikDriver {
         | "access_tokens"
         | "grouped_layers"
         | "mbgljs_renderer"
+        | "vector_tiles"
         | "",
       zoom?: number
     ) => {
@@ -109,6 +118,7 @@ export class MaputnikDriver {
         access_tokens: "access-token-style.json",
         grouped_layers: "grouped-layers-style.json",
         mbgljs_renderer: "example-style-with-mbgljs-renderer.json",
+        vector_tiles: "vector-tiles-style.json",
       };
 
       const url = new URL(baseUrl);
@@ -304,6 +314,11 @@ export class MaputnikDriver {
     /** Chooses how the filter items combine: all / none / any. */
     selectFilterCombiningOperator: async (value: string) => {
       await this.helper.when.selectWithin("filter-combining-operator", value);
+    },
+
+    /** Types into the property name of the first filter item, which opens the suggestions that match the text. */
+    typeFilterProperty: async (text: string) => {
+      await this.helper.get.element(".maputnik-filter-editor-property .maputnik-autocomplete input").first().fill(text);
     },
 
     deleteFilterItem: async (index = 0) => {

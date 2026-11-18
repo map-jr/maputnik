@@ -134,6 +134,9 @@ export class Assertable<T> {
       }
     });
 
+  shouldNotInclude = (value: string) =>
+    this.assertValue((actual) => expect(String(actual)).not.toContain(value));
+
   shouldDeepNestedInclude = (value: Record<string, unknown> | unknown[]) =>
     this.assertValue((actual) => assertDeepNestedInclude(actual, value));
 
@@ -192,6 +195,7 @@ async function centerOf(locator: Locator): Promise<{ x: number; y: number }> {
  */
 export class PlaywrightHelper {
   private readonly recordedRequests = new Map<string, Request[]>();
+  private readonly consoleMessages: string[] = [];
 
   private get page(): Page {
     return currentPage();
@@ -242,6 +246,19 @@ export class PlaywrightHelper {
         this.recordedRequests.get(alias)!.push(route.request());
         route.continue();
       });
+    },
+
+    /** Answers requests to `url` with the bytes of a fixture file (e.g. a vector tile). */
+    interceptAndServeFixtureFile: async (url: string | RegExp, fixture: string, contentType: string) => {
+      await this.page.route(url, (route) =>
+        route.fulfill({ body: fs.readFileSync(path.join(FIXTURES_DIR, fixture)), contentType })
+      );
+    },
+
+    /** Records the console messages of the page. Must be called before the page under test is loaded. */
+    recordConsoleMessages: async () => {
+      this.consoleMessages.length = 0;
+      this.page.on("console", (message) => this.consoleMessages.push(`${message.type()}: ${message.text()}`));
     },
 
     interceptAndMockResponse: async (options: {
@@ -471,5 +488,8 @@ export class PlaywrightHelper {
     elementsText: (testId: string) => new Query<string>(() => this.testId(testId).first().innerText()),
 
     locationHash: () => new Query<string>(async () => new URL(this.page.url()).hash),
+
+    /** The console messages recorded since `given.recordConsoleMessages()`, one per line. */
+    consoleMessages: () => new Query<string>(async () => this.consoleMessages.join("\n")),
   };
 }

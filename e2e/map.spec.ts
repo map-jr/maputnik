@@ -64,4 +64,20 @@ describe("map", () => {
       await then(get.elementByTestId("feature-layer-popup")).shouldBeVisible();
     });
   });
+
+  describe("layer watcher", () => {
+    beforeEach(async () => {
+      await given.recordConsoleMessages();
+      await when.setStyle("vector_tiles");
+    });
+
+    test("finds the properties of the features in the vector tiles and awaits querySourceFeatures", async () => {
+      await when.click("layer-list-item:places");
+      await when.addFilter();
+      await when.typeFilterProperty("cl");
+      await then(get.element(".maputnik-autocomplete-menu-item")).shouldContainText("class");
+      // Map Jr. GL writes a warning when the result of querySourceFeatures is used without await.
+      await then(get.consoleMessages()).shouldNotInclude("querySourceFeatures");
+    });
+  });
 });

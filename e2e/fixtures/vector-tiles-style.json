@@ -1,0 +1,27 @@
+{
+  "id": "vector-tiles-style",
+  "version": 8,
+  "name": "Vector tiles",
+  "metadata": {
+    "maputnik:renderer": "mlgljs"
+  },
+  "center": [0, 0],
+  "zoom": 1,
+  "sources": {
+    "places": {
+      "type": "vector",
+      "url": "http://localhost:8888/places-tilejson.json"
+    }
+  },
+  "layers": [
+    {
+      "id": "places",
+      "type": "circle",
+      "source": "places",
+      "source-layer": "places",
+      "paint": {
+        "circle-color": "#f00"
+      }
+    }
+  ]
+}

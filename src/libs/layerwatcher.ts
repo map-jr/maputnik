@@ -45,14 +45,16 @@ export class LayerWatcher {
     this.throttledAnalyzeVectorLayerFields(map);
   }
 
-  analyzeVectorLayerFields(map: Map) {
+  async analyzeVectorLayerFields(map: Map) {
     const previousVectorLayers = { ...this._vectorLayers };
 
-    Object.keys(this._sources).forEach(sourceId => {
-      (this._sources[sourceId] || []).forEach(vectorLayerId => {
-        const knownProperties = this._vectorLayers[vectorLayerId] || {};
+    for (const sourceId of Object.keys(this._sources)) {
+      for (const vectorLayerId of this._sources[sourceId] || []) {
         const params = { sourceLayer: vectorLayerId };
-        map.querySourceFeatures(sourceId, params as any).forEach(feature => {
+        // MapLibre GL JS returns the features; Map Jr. GL returns a promise of them, because its tile data is in a worker.
+        const features = await map.querySourceFeatures(sourceId, params as any);
+        const knownProperties = this._vectorLayers[vectorLayerId] || {};
+        features.forEach(feature => {
           Object.keys(feature.properties).forEach(propertyName => {
             const knownPropertyValues = knownProperties[propertyName] || {};
             knownPropertyValues[feature.properties[propertyName]] = {};
@@ -61,8 +63,8 @@ export class LayerWatcher {
         });
 
         this._vectorLayers[vectorLayerId] = knownProperties;
-      });
-    });
+      }
+    }
 
     if(!isEqual(previousVectorLayers, this._vectorLayers)) {
       this.onVectorLayersChange(this._vectorLayers);
