@@ -1,0 +1,6 @@
+{
+  "tilejson": "3.0.0",
+  "tiles": ["http://localhost:8888/tiles/{z}/{x}/{y}.mvt"],
+  "maxzoom": 2,
+  "vector_layers": [{ "id": "places", "fields": { "class": "String" } }]
+}

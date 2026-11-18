@@ -30,17 +30,33 @@ describe("LayerWatcher", () => {
     expect(onSourcesChange).toHaveBeenCalledOnce();
   });
 
-  it("collects vector layer field values from source features", () => {
+  it("collects vector layer field values from source features", async () => {
     const onVectorLayersChange = vi.fn();
     const watcher = new LayerWatcher({ onVectorLayersChange });
 
     const map = mockMap();
     watcher.analyzeMap(map); // populates _sources
-    watcher.analyzeVectorLayerFields(map);
+    await watcher.analyzeVectorLayerFields(map);
 
     expect(onVectorLayersChange).toHaveBeenCalled();
     expect(watcher.vectorLayers.water.class).toHaveProperty("river");
     expect(watcher.vectorLayers.water.class).toHaveProperty("canal");
     expect(watcher.vectorLayers.water.name).toHaveProperty("A");
+  });
+
+  it("awaits the features when querySourceFeatures returns a promise, as Map Jr. GL does", async () => {
+    const onVectorLayersChange = vi.fn();
+    const watcher = new LayerWatcher({ onVectorLayersChange });
+
+    const map = mockMap();
+    const features = [{ properties: { class: "river" } }];
+    // Map Jr. GL returns an array that is not complete yet, which is also a promise of the complete result.
+    map.querySourceFeatures = (() => Object.assign([], {
+      then: (resolve: (value: unknown) => void) => resolve(features),
+    })) as unknown as Map["querySourceFeatures"];
+    watcher.analyzeMap(map);
+    await watcher.analyzeVectorLayerFields(map);
+
+    expect(watcher.vectorLayers.water.class).toHaveProperty("river");
   });
 });
