@@ -45,6 +45,7 @@ export class MaputnikDriver {
         "vector-tiles-style.json",
         "places-tilejson.json",
         "color-scheme-style.json",
+        "style-images-style.json",
       ];
       for (const fixture of styleFixtures) {
         await this.helper.given.interceptAndMockResponse({
@@ -106,6 +107,7 @@ export class MaputnikDriver {
         | "mbgljs_renderer"
         | "vector_tiles"
         | "color_scheme"
+        | "style_images"
         | "",
       zoom?: number
     ) => {
@@ -122,6 +124,7 @@ export class MaputnikDriver {
         mbgljs_renderer: "example-style-with-mbgljs-renderer.json",
         vector_tiles: "vector-tiles-style.json",
         color_scheme: "color-scheme-style.json",
+        style_images: "style-images-style.json",
       };
 
       const url = new URL(baseUrl);
@@ -342,6 +345,13 @@ export class MaputnikDriver {
      */
     deleteFilterExpression: async () => {
       await this.helper.get.element("[data-wd-key='delete-expression']").first().click();
+    },
+
+    /** Replaces the text of an autocomplete spec field (e.g. icon-image), which opens the suggestions that match it. */
+    typeInAutocompleteField: async (fieldName: string, text: string) => {
+      const input = this.helper.get.elementByTestId("spec-field:" + fieldName).locator(".maputnik-autocomplete input");
+      await input.scrollIntoViewIfNeeded();
+      await input.fill(text);
     },
 
     setColorValue: async (fieldName: string, value: string) => {

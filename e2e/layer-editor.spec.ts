@@ -491,6 +491,19 @@ describe("layer editor", () => {
   });
 
   describe("layout", () => {
+    test("icon-image suggests the images of metadata[\"map-jr:images\"] and the slots of a template", async () => {
+      await when.setStyle("style_images");
+      await when.click("layer-list-item:places");
+      await when.typeInAutocompleteField("icon-image", "");
+      await then(get.element(".maputnik-autocomplete-menu-item")).shouldHaveLength(2);
+      await then(get.element(".maputnik-autocomplete-menu-item").nth(0)).shouldHaveText("pin (params: color, stroke)");
+      await then(get.element(".maputnik-autocomplete-menu-item").nth(1)).shouldHaveText("square");
+      await when.clickByText("pin (params: color, stroke)");
+      await then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        layers: [{ id: "places", layout: { "icon-image": "pin" } }],
+      });
+    });
+
     test("text-font", async () => {
       await when.setStyle("font");
       await when.collapseGroupInLayerEditor();

@@ -33,6 +33,7 @@ import { emptyStyle, getAccessToken, replaceAccessTokens } from "../libs/style";
 import { undoMessages, redoMessages } from "../libs/diffmessage";
 import { createStyleStore, type IStyleStore } from "../libs/store/style-store-factory";
 import { stripImageParams } from "../libs/image-params";
+import { imageSuggestions, STYLE_IMAGES_KEY } from "../libs/style-images";
 import { RevisionStore } from "../libs/revisions";
 import { LayerWatcher } from "../libs/layerwatcher";
 import tokens from "../config/tokens.json";
@@ -144,6 +145,8 @@ export class App extends React.Component<any, AppState> {
   revisionStore: RevisionStore;
   styleStore: IStyleStore | null = null;
   layerWatcher: LayerWatcher;
+  /** The names of the images of the sprite of the style. */
+  spriteIcons: string[] = [];
 
   constructor(props: any) {
     super(props);
@@ -321,8 +324,14 @@ export class App extends React.Component<any, AppState> {
 
   updateIcons(baseUrl: string) {
     downloadSpriteMetadata(baseUrl).then(icons => {
-      this.setState({ spec: updateRootSpec(this.state.spec, "sprite", icons)});
+      this.spriteIcons = icons;
+      this.updateIconSuggestions(this.state.mapStyle);
     });
+  }
+
+  /** Suggests the images of metadata["map-jr:images"] and of the sprite in the image fields (`icon-image`, patterns). */
+  updateIconSuggestions(style: StyleSpecification) {
+    this.setState(state => ({ spec: updateRootSpec(state.spec, "sprite", imageSuggestions(style, this.spriteIcons)) }));
   }
 
   onChangeMetadataProperty = (property: string, value: any) => {
@@ -484,6 +493,9 @@ export class App extends React.Component<any, AppState> {
     }
     if(newStyle.sprite !== this.state.mapStyle.sprite) {
       this.updateIcons(newStyle.sprite as string);
+    }
+    if((newStyle.metadata as any)?.[STYLE_IMAGES_KEY] !== (this.state.mapStyle.metadata as any)?.[STYLE_IMAGES_KEY]) {
+      this.updateIconSuggestions(newStyle);
     }
 
     if (opts.addRevision) {
