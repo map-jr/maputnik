@@ -47,6 +47,7 @@ export class MaputnikDriver {
         "color-scheme-style.json",
         "style-images-style.json",
         "params-slot-style.json",
+        "images-panel-style.json",
       ];
       for (const fixture of styleFixtures) {
         await this.helper.given.interceptAndMockResponse({
@@ -110,6 +111,7 @@ export class MaputnikDriver {
         | "color_scheme"
         | "style_images"
         | "params_slot"
+        | "images_panel"
         | "",
       zoom?: number
     ) => {
@@ -128,6 +130,7 @@ export class MaputnikDriver {
         color_scheme: "color-scheme-style.json",
         style_images: "style-images-style.json",
         params_slot: "params-slot-style.json",
+        images_panel: "images-panel-style.json",
       };
 
       const url = new URL(baseUrl);
@@ -378,6 +381,11 @@ export class MaputnikDriver {
       await this.helper.when.clickByText(lineText);
       await this.helper.when.typeKeys("{end}");
       await this.helper.when.typeText(text);
+    },
+
+    /** Chooses an SVG file with the given text in the images panel (the add form, or the replace input of an image). */
+    chooseSvgInImagesPanel: async (testId: string, fileName: string, svg: string) => {
+      await this.helper.when.setFileInput(testId, fileName, "image/svg+xml", svg);
     },
 
     waitForExampleFileResponse: () => this.helper.when.waitForResponse("example-style.json"),

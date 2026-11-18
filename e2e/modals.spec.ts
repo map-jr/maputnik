@@ -612,6 +612,64 @@ describe("modals", () => {
     });
   });
 
+  describe("images", () => {
+    const square = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\"><rect width=\"40\" height=\"40\" fill=\"#ff0000\"/></svg>";
+    const dot = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\"><circle cx=\"5\" cy=\"5\" r=\"5\" fill=\"{{fill}}\"/></svg>";
+
+    beforeEach(async () => {
+      await when.setStyle("images_panel");
+      await when.click("nav:images");
+    });
+
+    test("lists the images of the style with their slots", async () => {
+      await then(get.elementByTestId("modal:images.preview:pin")).shouldBeVisible();
+      await then(get.elementByTestId("modal:images.slots:pin")).shouldContainText("color, stroke");
+    });
+
+    test("adds an image that is saved and drawn in the preview", async () => {
+      // The layer "places" asks for the image "square" at the center of the map, which the style does not have yet.
+      await when.modal.close("modal:images");
+      await then(get.centerPixelColor("maplibre:map")).shouldEqual("255,255,255");
+      await when.click("nav:images");
+      await when.setValue("modal:images.add.name", "square");
+      await when.chooseSvgInImagesPanel("modal:images.add.file", "red.svg", square);
+      await then(get.elementByTestId("modal:images.image:square")).shouldBeVisible();
+      await then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        metadata: { "map-jr:images": { square } },
+      });
+      await when.modal.close("modal:images");
+      await then(get.centerPixelColor("maplibre:map")).shouldEqual("255,0,0");
+    });
+
+    test("names an added image after its file when the name is empty", async () => {
+      await when.chooseSvgInImagesPanel("modal:images.add.file", "dot.svg", dot);
+      await then(get.elementByTestId("modal:images.slots:dot")).shouldContainText("fill");
+      await then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        metadata: { "map-jr:images": { dot } },
+      });
+    });
+
+    test("rejects a file that is not an SVG document", async () => {
+      await when.chooseSvgInImagesPanel("modal:images.add.file", "notes.svg", "not an image");
+      await then(get.elementByTestId("modal:images.error")).shouldContainText("is not an SVG document");
+      await then(get.elementByTestId("modal:images.image:notes")).shouldNotExist();
+    });
+
+    test("replaces an image", async () => {
+      await when.chooseSvgInImagesPanel("modal:images.replace:pin", "dot.svg", dot);
+      await then(get.elementByTestId("modal:images.slots:pin")).shouldContainText("fill");
+      await then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        metadata: { "map-jr:images": { pin: dot } },
+      });
+    });
+
+    test("removes an image", async () => {
+      await when.click("modal:images.remove:pin");
+      await then(get.elementByTestId("modal:images.image:pin")).shouldNotExist();
+      await then(get.styleFromLocalStorage().then(style => style.metadata)).shouldNotHaveProperty("map-jr:images");
+    });
+  });
+
   describe("error panel", () => {
     test("not visible when no errors", async () => {
       await then(get.element("maputnik-message-panel-error")).shouldNotExist();
