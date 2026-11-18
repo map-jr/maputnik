@@ -11,7 +11,8 @@ import {
   MdLanguage,
   MdSave,
   MdPublic,
-  MdCode
+  MdCode,
+  MdImage
 } from "react-icons/md";
 import pkgJson from "../../package.json";
 //@ts-ignore
@@ -24,7 +25,7 @@ import type { OnStyleChangedCallback } from "../libs/definitions";
 const browser = detect();
 const colorAccessibilityFiltersEnabled = ["chrome", "firefox"].indexOf(browser!.name) > -1;
 
-export type ModalTypes = "settings" | "sources" | "open" | "shortcuts" | "export" | "debug" | "globalState" | "codeEditor";
+export type ModalTypes = "settings" | "sources" | "images" | "open" | "shortcuts" | "export" | "debug" | "globalState" | "codeEditor";
 
 type IconTextProps = {
   children?: React.ReactNode
@@ -237,6 +238,10 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
           <ToolbarAction wdKey="nav:sources" onClick={() => this.props.onToggleModal("sources")}>
             <MdLayers />
             <IconText>{t("Data Sources")}</IconText>
+          </ToolbarAction>
+          <ToolbarAction wdKey="nav:images" onClick={() => this.props.onToggleModal("images")}>
+            <MdImage />
+            <IconText>{t("Images")}</IconText>
           </ToolbarAction>
           <ToolbarAction wdKey="nav:settings" onClick={() => this.props.onToggleModal("settings")}>
             <MdSettings />

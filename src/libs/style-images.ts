@@ -96,3 +96,49 @@ export function paramsSlotErrors(style: StyleSpecification | undefined): ParamsS
   });
   return errors;
 }
+
+/** Map Jr. GL takes an image of the style of at most this many characters. */
+export const MAX_IMAGE_LENGTH = 200000;
+
+/** Whether the text of an image is an SVG document, which is how Map Jr. GL tells it from a URL. */
+export function isSvg(text: string): boolean {
+  return text.trimStart().startsWith("<");
+}
+
+/** The text of an image entry: the entry itself, or its `image`. */
+export function styleImageText(style: StyleSpecification, name: string): string | undefined {
+  const entry = ((style.metadata as Record<string, unknown> | undefined)?.[STYLE_IMAGES_KEY] as Record<string, unknown> | undefined)?.[name];
+  if (typeof entry === "string") return entry;
+  const image = (entry as {image?: unknown} | undefined)?.image;
+  return typeof image === "string" ? image : undefined;
+}
+
+function withImages<T extends StyleSpecification>(style: T, images: Record<string, unknown>): T {
+  const metadata: Record<string, unknown> = { ...(style.metadata as Record<string, unknown> | undefined) };
+  if (Object.keys(images).length > 0) metadata[STYLE_IMAGES_KEY] = images;
+  else delete metadata[STYLE_IMAGES_KEY];
+  return { ...style, metadata };
+}
+
+function imagesOf(style: StyleSpecification): Record<string, unknown> {
+  const images = (style.metadata as Record<string, unknown> | undefined)?.[STYLE_IMAGES_KEY];
+  return images && typeof images === "object" && !Array.isArray(images) ? images as Record<string, unknown> : {};
+}
+
+/**
+ * Returns the style with the image `name` set to `text`. An entry of the form `{image, width, height, ...}` keeps its
+ * other fields and gets the new text as `image`.
+ */
+export function setStyleImage<T extends StyleSpecification>(style: T, name: string, text: string): T {
+  const images = imagesOf(style);
+  const entry = images[name];
+  const next = entry && typeof entry === "object" ? { ...entry, image: text } : text;
+  return withImages(style, { ...images, [name]: next });
+}
+
+/** Returns the style without the image `name`, and without `metadata["map-jr:images"]` when no image is left. */
+export function removeStyleImage<T extends StyleSpecification>(style: T, name: string): T {
+  const images = { ...imagesOf(style) };
+  delete images[name];
+  return withImages(style, images);
+}

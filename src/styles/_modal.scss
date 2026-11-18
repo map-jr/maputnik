@@ -236,6 +236,47 @@
   text-align: left;
 }
 
+//IMAGES MODAL
+.maputnik-style-image {
+  min-width: 500px;
+  margin-bottom: vars.$margin-2;
+}
+
+.maputnik-style-image-header {
+  background-color: vars.$color-gray;
+  color: vars.$color-lowgray;
+  padding: vars.$margin-2;
+
+  @include mixins.flex-row;
+}
+
+.maputnik-style-image-header-name {
+  font-weight: 700;
+  line-height: 2;
+  font-size: vars.$font-size-5;
+}
+
+.maputnik-style-image-content {
+  border-color: vars.$color-gray;
+  border-width: 2px;
+  border-style: solid;
+  padding: vars.$margin-2;
+}
+
+.maputnik-style-image-preview {
+  display: block;
+  max-width: 64px;
+  max-height: 64px;
+  margin-bottom: vars.$margin-2;
+  background-color: vars.$color-lowgray;
+}
+
+.maputnik-style-image-file {
+  display: block;
+  font-size: vars.$font-size-6;
+  color: vars.$color-lowgray;
+}
+
 .maputnik-active-source-type-editor {
   min-width: 500px;
 }

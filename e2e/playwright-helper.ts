@@ -423,6 +423,11 @@ export class PlaywrightHelper {
       });
     },
 
+    /** Chooses a file with the given text in an <input type="file">. */
+    setFileInput: async (testId: string, name: string, mimeType: string, text: string) => {
+      await this.testId(testId).setInputFiles({ name, mimeType, buffer: Buffer.from(text) });
+    },
+
     dropFileByFixture: async (fixture: string, dropzoneTestId: string) => {
       const content = JSON.stringify(this.readFixture(fixture));
       const dataTransfer = await this.page.evaluateHandle((fileContent) => {

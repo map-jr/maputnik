@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { StyleSpecification } from "maplibre-gl";
-import { imageSlots, imageSuggestions, paramsSlotErrors, styleImages } from "./style-images";
+import { imageSlots, imageSuggestions, paramsSlotErrors, removeStyleImage, setStyleImage, styleImages, styleImageText } from "./style-images";
 
 const style = (images: unknown) => ({
   version: 8,
@@ -81,5 +81,31 @@ describe("paramsSlotErrors", () => {
     expect(paramsSlotErrors(withLayout({ "icon-image": ["image", "sprite-icon", { params: { colour: "#f00" } }] }))).toEqual([]);
     expect(paramsSlotErrors(withLayout({ "icon-image": ["image", ["get", "name"], { params: { colour: "#f00" } }] }))).toEqual([]);
     expect(paramsSlotErrors(withLayout({ "icon-image": ["image", "pin", { params: { colour: "#f00" } }] }, { pin: "https://example.com/pin.png" }))).toEqual([]);
+  });
+});
+
+describe("setStyleImage and removeStyleImage", () => {
+  it("adds an image and keeps the other images and metadata", () => {
+    const input = { ...style({ pin: "<svg/>" }), metadata: { "map-jr:images": { pin: "<svg/>" }, "maputnik:renderer": "mlgljs" } } as unknown as StyleSpecification;
+    const out = setStyleImage(input, "dot", "<svg id=\"dot\"/>");
+    expect(out.metadata).toEqual({ "map-jr:images": { pin: "<svg/>", dot: "<svg id=\"dot\"/>" }, "maputnik:renderer": "mlgljs" });
+    expect((input.metadata as any)["map-jr:images"]).toEqual({ pin: "<svg/>" });
+  });
+
+  it("adds the first image to a style without metadata", () => {
+    const out = setStyleImage({ version: 8, sources: {}, layers: [] } as StyleSpecification, "dot", "<svg/>");
+    expect(out.metadata).toEqual({ "map-jr:images": { dot: "<svg/>" } });
+  });
+
+  it("replaces the text of an entry with width and height and keeps its fields", () => {
+    const out = setStyleImage(style({ pin: { image: "<svg/>", width: 10, height: 10 } }), "pin", "<svg id=\"new\"/>");
+    expect((out.metadata as any)["map-jr:images"].pin).toEqual({ image: "<svg id=\"new\"/>", width: 10, height: 10 });
+    expect(styleImageText(out, "pin")).toBe("<svg id=\"new\"/>");
+  });
+
+  it("removes an image, and the key when no image is left", () => {
+    const two = style({ pin: "<svg/>", dot: "<svg/>" });
+    expect((removeStyleImage(two, "pin").metadata as any)["map-jr:images"]).toEqual({ dot: "<svg/>" });
+    expect(removeStyleImage(style({ pin: "<svg/>" }), "pin").metadata).toEqual({});
   });
 });

@@ -27,6 +27,7 @@ import { ModalOpen } from "./modals/ModalOpen";
 import { ModalShortcuts } from "./modals/ModalShortcuts";
 import { ModalDebug } from "./modals/ModalDebug";
 import { ModalGlobalState } from "./modals/ModalGlobalState";
+import { ModalImages } from "./modals/ModalImages";
 
 import {downloadGlyphsMetadata, downloadSpriteMetadata} from "../libs/metadata";
 import { emptyStyle, getAccessToken, replaceAccessTokens } from "../libs/style";
@@ -131,6 +132,7 @@ type AppState = {
   isOpen: {
     settings: boolean
     sources: boolean
+    images: boolean
     open: boolean
     shortcuts: boolean
     export: boolean
@@ -174,6 +176,7 @@ export class App extends React.Component<any, AppState> {
       isOpen: {
         settings: false,
         sources: false,
+        images: false,
         open: false,
         shortcuts: false,
         export: false,
@@ -1008,6 +1011,12 @@ export class App extends React.Component<any, AppState> {
         onStyleChanged={this.onStyleChanged}
         isOpen={this.state.isOpen.sources}
         onOpenToggle={() => this.toggleModal("sources")}
+      />
+      <ModalImages
+        mapStyle={this.state.mapStyle}
+        onStyleChanged={this.onStyleChanged}
+        isOpen={this.state.isOpen.images}
+        onOpenToggle={() => this.toggleModal("images")}
       />
       <ModalGlobalState
         mapStyle={this.state.mapStyle}
