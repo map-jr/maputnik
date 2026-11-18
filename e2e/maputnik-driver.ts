@@ -44,6 +44,7 @@ export class MaputnikDriver {
         "example-style-with-mbgljs-renderer.json",
         "vector-tiles-style.json",
         "places-tilejson.json",
+        "color-scheme-style.json",
       ];
       for (const fixture of styleFixtures) {
         await this.helper.given.interceptAndMockResponse({
@@ -104,6 +105,7 @@ export class MaputnikDriver {
         | "grouped_layers"
         | "mbgljs_renderer"
         | "vector_tiles"
+        | "color_scheme"
         | "",
       zoom?: number
     ) => {
@@ -119,6 +121,7 @@ export class MaputnikDriver {
         grouped_layers: "grouped-layers-style.json",
         mbgljs_renderer: "example-style-with-mbgljs-renderer.json",
         vector_tiles: "vector-tiles-style.json",
+        color_scheme: "color-scheme-style.json",
       };
 
       const url = new URL(baseUrl);

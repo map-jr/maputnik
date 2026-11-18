@@ -1,0 +1,21 @@
+{
+  "id": "color-scheme-style",
+  "version": 8,
+  "name": "Color scheme",
+  "metadata": {
+    "maputnik:renderer": "mlgljs"
+  },
+  "state": {
+    "color-scheme": { "default": "light" }
+  },
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": ["case", ["==", ["global-state", "color-scheme"], "dark"], "#000000", "#ffffff"]
+      }
+    }
+  ]
+}
