@@ -46,6 +46,7 @@ export class MaputnikDriver {
         "places-tilejson.json",
         "color-scheme-style.json",
         "style-images-style.json",
+        "params-slot-style.json",
       ];
       for (const fixture of styleFixtures) {
         await this.helper.given.interceptAndMockResponse({
@@ -108,6 +109,7 @@ export class MaputnikDriver {
         | "vector_tiles"
         | "color_scheme"
         | "style_images"
+        | "params_slot"
         | "",
       zoom?: number
     ) => {
@@ -125,6 +127,7 @@ export class MaputnikDriver {
         vector_tiles: "vector-tiles-style.json",
         color_scheme: "color-scheme-style.json",
         style_images: "style-images-style.json",
+        params_slot: "params-slot-style.json",
       };
 
       const url = new URL(baseUrl);

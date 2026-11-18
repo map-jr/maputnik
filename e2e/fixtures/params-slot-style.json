@@ -1,0 +1,55 @@
+{
+  "id": "params-slot-style",
+  "version": 8,
+  "name": "Params with a wrong slot",
+  "metadata": {
+    "maputnik:renderer": "mlgljs",
+    "map-jr:images": {
+      "pin": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 31\"><path fill=\"{{color}}\" stroke=\"{{stroke}}\" d=\"M12 30C12 30 2 17 2 11a10 10 0 0 1 20 0c0 6-10 19-10 19z\"/></svg>",
+      "square": {
+        "image": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\"><rect width=\"10\" height=\"10\" fill=\"#2f7fd1\"/></svg>",
+        "width": 10,
+        "height": 10
+      }
+    }
+  },
+  "sources": {
+    "places": {
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "places",
+      "type": "symbol",
+      "source": "places",
+      "layout": {
+        "icon-image": [
+          "image",
+          "pin",
+          {
+            "params": {
+              "colour": "#d6453d"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
