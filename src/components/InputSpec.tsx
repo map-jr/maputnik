@@ -73,10 +73,11 @@ export class InputSpec extends React.Component<InputSpecProps> {
       case "formatted":
       case "string":
         if (iconProperties.indexOf(this.props.fieldName!) >= 0) {
+          // A value is a name, or [name, label] (an image of the style, whose label names its slots).
           const options = this.props.fieldSpec.values || [];
           return <InputAutocomplete
             {...commonProps as Omit<InputAutocompleteProps, "options">}
-            options={options.map(f => [f, f])}
+            options={options.map(f => Array.isArray(f) ? f : [f, f])}
           />;
         } else {
           return <InputString
