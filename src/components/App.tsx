@@ -33,7 +33,7 @@ import { emptyStyle, getAccessToken, replaceAccessTokens } from "../libs/style";
 import { undoMessages, redoMessages } from "../libs/diffmessage";
 import { createStyleStore, type IStyleStore } from "../libs/store/style-store-factory";
 import { stripImageParams } from "../libs/image-params";
-import { imageSuggestions, STYLE_IMAGES_KEY } from "../libs/style-images";
+import { imageSuggestions, paramsSlotErrors, STYLE_IMAGES_KEY } from "../libs/style-images";
 import { RevisionStore } from "../libs/revisions";
 import { LayerWatcher } from "../libs/layerwatcher";
 import tokens from "../config/tokens.json";
@@ -467,6 +467,13 @@ export class App extends React.Component<any, AppState> {
         };
       }
     });
+    // The style spec accepts any key in `params`, but Map Jr. GL only fills the slots of the image.
+    for (const { index, key, message } of paramsSlotErrors(newStyle)) {
+      mappedErrors.push({
+        message: `layers[${index}].${key}: ${message}`,
+        parsed: { type: "layer", data: { index, key, message } },
+      });
+    }
 
     let dirtyMapStyle: StyleSpecification | undefined = undefined;
     if (errors.length > 0) {

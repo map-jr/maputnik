@@ -625,6 +625,14 @@ describe("modals", () => {
       });
       await then(get.element(".maputnik-message-panel-error")).shouldBeVisible();
     });
+
+    test("names a key of params that is not a slot of the image", async () => {
+      await when.setStyle("params_slot");
+      await then(get.element(".maputnik-message-panel-error")).shouldHaveLength(1);
+      await then(get.element(".maputnik-message-panel-error")).shouldContainText(
+        "Layer 'places': params \"colour\" is not a slot of the image \"pin\". Its slots are \"color\", \"stroke\"."
+      );
+    });
   });
 
   describe("Handle localStorage QuotaExceededError", () => {

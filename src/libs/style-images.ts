@@ -47,3 +47,52 @@ export function imageSuggestions(style: StyleSpecification | undefined, spriteIc
     ...spriteIcons.filter(icon => !names.has(icon)).map((icon): [string, string] => [icon, icon]),
   ];
 }
+
+export type ParamsSlotError = {
+  /** The index of the layer in `layers`. */
+  index: number
+  /** The property with the group, for example `layout.icon-image`. */
+  key: string
+  message: string
+};
+
+/**
+ * The keys of `params` in `["image", name, {"params": {...}}]` that are not slots of the image. Only an image whose
+ * name is literal text and that is an SVG document in `metadata["map-jr:images"]` is checked: the slots of an image
+ * of the sprite, of an image at a URL, or of a name that an expression computes are not known to the editor.
+ */
+export function paramsSlotErrors(style: StyleSpecification | undefined): ParamsSlotError[] {
+  const images = (style?.metadata as Record<string, unknown> | undefined)?.[STYLE_IMAGES_KEY];
+  if (!images || typeof images !== "object" || !Array.isArray(style?.layers)) return [];
+  const entries = images as Record<string, unknown>;
+  const errors: ParamsSlotError[] = [];
+
+  const visit = (value: unknown, report: (message: string) => void) => {
+    if (!Array.isArray(value)) return;
+    const [operator, name, options] = value;
+    if (operator === "image" && typeof name === "string" && Object.prototype.hasOwnProperty.call(entries, name)) {
+      const text = typeof entries[name] === "string" ? entries[name] : (entries[name] as {image?: unknown})?.image;
+      const params = (options as {params?: unknown} | undefined)?.params;
+      if (typeof text === "string" && text.trimStart().startsWith("<") && params && typeof params === "object") {
+        const slots = imageSlots(text);
+        for (const key of Object.keys(params)) {
+          if (slots.includes(key)) continue;
+          report(`params "${key}" is not a slot of the image "${name}". ` +
+            (slots.length ? `Its slots are ${slots.map(slot => `"${slot}"`).join(", ")}.` : "The image has no slots."));
+        }
+      }
+    }
+    value.forEach(item => visit(item, report));
+  };
+
+  style.layers.forEach((layer, index) => {
+    for (const group of ["layout", "paint"] as const) {
+      const properties = (layer as {[key in typeof group]?: Record<string, unknown>})[group];
+      for (const property in properties) {
+        const key = `${group}.${property}`;
+        visit(properties[property], message => errors.push({ index, key, message }));
+      }
+    }
+  });
+  return errors;
+}
