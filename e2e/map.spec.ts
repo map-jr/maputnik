@@ -80,4 +80,23 @@ describe("map", () => {
       await then(get.consoleMessages()).shouldNotInclude("querySourceFeatures");
     });
   });
+
+  describe("global state", () => {
+    beforeEach(async () => {
+      await when.setStyle("color_scheme");
+    });
+
+    test("a value set in the Global State panel reaches the preview", async () => {
+      // The background of color-scheme-style.json is white for "light" and black for "dark".
+      await then(get.centerPixelColor("maplibre:map")).shouldEqual("255,255,255");
+      await when.click("nav:global-state");
+      await when.setValue("global-state-variable-value:0", "dark");
+      await when.typeKeys("{enter}");
+      await when.modal.close("modal:global-state");
+      await then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        state: { "color-scheme": { default: "dark" } },
+      });
+      await then(get.centerPixelColor("maplibre:map")).shouldEqual("0,0,0");
+    });
+  });
 });

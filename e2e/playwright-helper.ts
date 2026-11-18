@@ -491,5 +491,18 @@ export class PlaywrightHelper {
 
     /** The console messages recorded since `given.recordConsoleMessages()`, one per line. */
     consoleMessages: () => new Query<string>(async () => this.consoleMessages.join("\n")),
+
+    /** The color ("r,g,b") of the pixel at the center of an element, read from a screenshot. */
+    centerPixelColor: (testId: string) =>
+      new Query<string>(async () => {
+        const png = (await this.testId(testId).first().screenshot()).toString("base64");
+        return this.page.evaluate(async (base64) => {
+          const image = await createImageBitmap(await (await fetch("data:image/png;base64," + base64)).blob());
+          const context = new OffscreenCanvas(image.width, image.height).getContext("2d")!;
+          context.drawImage(image, 0, 0);
+          const [r, g, b] = context.getImageData(image.width / 2, image.height / 2, 1, 1).data;
+          return `${r},${g},${b}`;
+        }, png);
+      }),
   };
 }
